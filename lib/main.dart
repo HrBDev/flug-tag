@@ -1,23 +1,21 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:dart_tags/dart_tags.dart';
 import 'package:flutter/material.dart';
 
-import 'package:dart_tags/dart_tags.dart';
-
-
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'dart tag reader demo',
-      theme: new ThemeData(
+      theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(title: 'dart tag reader'),
+      home: MyHomePage(title: 'dart tag reader'),
     );
   }
 }
@@ -28,52 +26,52 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Uint8List _imageData = new Uint8List(0);
+  Uint8List _imageData = Uint8List(0);
   String _artist = "";
   String _title = "";
   String _comment = "";
 
-  Future _incrementCounter() async {
-    
+  Future _readTag() async {
     var d = await DefaultAssetBundle.of(context).load('data/mp3.mp3');
 
-      TagProcessor tp = new TagProcessor();
-      var l = await tp.getTagsFromByteData(d, [TagType.id3v2]);
+    TagProcessor tp = TagProcessor();
+    var l = await tp.getTagsFromByteData(d, [TagType.id3v2]);
 
-      AttachedPicture ai = l[0].tags['APIC'];
+    AttachedPicture ai = l[0].tags['APIC'];
 
     setState(() {
       _artist = l[0].tags['artist'];
       _title = l[0].tags['title'];
       _comment = l[0].tags['comment'];
-      _imageData = new Uint8List.fromList(ai.imageData);
+      _imageData = Uint8List.fromList(ai.imageData);
     });
+    print('Artist: $_artist\nTitle: $_title\nComment: $_comment\n');
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
       ),
-      body: new Center(
-        child: new Column(
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Text('artist:$_artist\ntitle:$_title\ncomment:$_comment\n'),
-            new Image.memory(_imageData),
+            Text('Artist: $_artist\nTitle: $_title\nComment: $_comment\n'),
+            Image.memory(_imageData),
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _readTag,
         tooltip: 'read tag',
-        child: new Icon(Icons.cached),
-      ), 
+        child: Icon(Icons.cached),
+      ),
     );
   }
 }
